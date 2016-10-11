@@ -30,7 +30,7 @@
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <form role="form"  action = "./PostAddNewDomaine" method = "POST">
+                                    <form role="form"  action = "./PostAddNewDomaine" method = "POST"  enctype="multipart/form-data">
                                         <div class="form-group">
                                             <label>Domaine name</label>
                                             <input class="form-control" name="domaineName">                                           
@@ -43,10 +43,7 @@
                                                 
                                             </select>
                                         </div>
-                                        <div class="form-group">
-                                            <label>Trainning Script</label>
-                                            <input type="file" name="trainingScript">
-                                        </div>
+                                        
                                          <div class="form-group">
                                             <label>Lexicon data base</label>
                                             <input type="file" name="lexiconDataBase">
