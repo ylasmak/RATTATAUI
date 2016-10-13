@@ -9,11 +9,13 @@ mongoose.Promise = global.Promise;
 mongoose.connect( url);
 // create a schema
 var domaineSchema = new Schema({
+
   domaine_name: { type: String, required: true, unique: true },
   domaine_language: { type: String, required: true },
   domaine_trainingScript:  String,
   domaine_predictionScript:  String,
   domaine_lexicon_data_base: [],
+      
   created_at: Date
 });
 
