@@ -29,11 +29,7 @@ router.get('/AddNewDomaine', function(req, res) {
 
 
 router.post('/PostAddNewDomaine', upload.single('lexiconDataBase'), function(req, res) {
-
-    console.log('------------');
-    console.log(req.body) // form fields
-    console.log(req.file)
-
+    
     if (req.file) {
 
         fs.readFile("./uploads/" + req.file.filename, 'utf8', function(err, data) {
@@ -42,15 +38,7 @@ router.post('/PostAddNewDomaine', upload.single('lexiconDataBase'), function(req
             parse(data, {
                 columns: true
             }, function(err, output) {
-                if (err) console.log(err);
-                console.log("--end parssing CSV --");
-                console.log(output.length);
-
-                output.forEach(function(line) {
-                    console.log(line);
-                });
-
-                console.log('----------------end Domaine-----------');
+                if (err) console.log(err);               
 
                 var domaine = new dmn({
                     domaine_name: req.body.domaineName,
@@ -60,32 +48,19 @@ router.post('/PostAddNewDomaine', upload.single('lexiconDataBase'), function(req
                     created_at: Date.now()
                 });
 
-
                 domaine.save(function(err, domaine) {
                     if (err) {
                         console.log(err);
-                    } else {
-                        console.log('saving done');
-                        console.log(domaine);
-                        req.session.domaine = domaine;
-                    }
+                    } 
+
+                    req.method = 'get';
+                    res.redirect('/edit_domaine');
                 });
-
-
-                console.log('saving OK');
-                res.writeHead(302, {
-                    'Location': './edit_domaine'
-
-                });
-
             });
 
         })
     }
-
-
-
-
+    
 });
 
 router.get("/edit_domaine", function(req, res)
@@ -94,7 +69,7 @@ router.get("/edit_domaine", function(req, res)
         console.log('edit_domaine')
         var text = "Hello word"
         res.render('pages/grid.ejs', {
-            tagline: req.session.domaine.domaine_trainingScript
+            tagline: text
         });
     }
 );
@@ -102,17 +77,16 @@ router.get("/edit_domaine", function(req, res)
 
 router.post('/importTrainingScrip', upload.single('trainingScript'), function(req, res) {
 
-       if (req.file) {
-       
+    if (req.file) {
+
         fs.readFile("./uploads/" + req.file.filename, 'utf8', function(err, data) {
             if (err) console.log(err);
-            req.session.domaine.domaine_trainingScript = data;
-            res.writeHead(302, {
-                'Location': './edit_domaine'
+           req.session.domaine.domaine_trainingScript = data;
 
-            });
+            req.method = 'get';
+            res.redirect('/edit_domaine');
 
-
+           
         })
     }
 

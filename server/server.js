@@ -4,8 +4,8 @@ var cookie = require('cookie-parser');
 var app = express();
  
 app.use(express.static(__dirname + '/public'));
-app.use(cookie.cookieParser());
-app.use(express.session({secret: '1234567890QWERTY'}));
+//app.use(cookie.cookieParser());
+app.use(session({secret: '1234567890QWERTY'}));
 //Routes
 app.use(require('./routes'));
  
