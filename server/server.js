@@ -10,7 +10,7 @@ app.use(session({secret: '1234567890QWERTY'}));
 app.use(require('./routes'));
  
 //app.use("/user",require('./routes'));  //http://127.0.0.1:8000/user  http://127.0.0.1:8000/user/about
- 
+ app.set('view engine', 'ejs');
  
 var server = app.listen(8081, function () {
  

@@ -9,11 +9,7 @@
 <body>
 
     <div id="wrapper">
-
-        <!-- Navigation -->
-         <% include ../partials/navigation %>
-
-        <div id="page-wrapper">
+        <div id="page-wrapper"  style="margin-left: 0px;">
             <div class="row">
                 <div class="col-lg-12">
                     <h1 class="page-header">RATTATA Sentiement analysis</h1>
@@ -33,34 +29,33 @@
                                     <div class="form-group">
                                           <form role="form"  action = "./importTrainingScrip" method = "POST"  enctype="multipart/form-data">
                                                <div class="form-group">
-                                            <label>Lexicon data base</label>
-                                            <input type="file" name="trainingScript">
-                                         <button type="submit" class="btn btn-primary"> Upload </button>
-                                     </div>
+                                                 <label>Training Script</label>
+                                                 <input type="file" name="trainingScript">
+                                                 <button type="submit" class="btn btn-primary"> Upload </button>
+                                                </div>
+                                        </form>
                                      
                                       <div class="form-group">
-                                          <form role="form"  action = "./updateScript" method = "POST"  enctype="multipart/form-data">
+                                          <form role="form"  action = "./updateScript" method = "POST">
                                                <div class="form-group">
                                             <label>Script</label>
-                                           <textarea class="form-control" rows="50"><%= tagline %></textarea>
-                                         <button type="submit" class="btn btn-primary"> Upload </button>
+                                        <textarea class="form-control" rows="50" name="script"><%= tagline %></textarea>
+                                          <input type="hidden" name ="h_script>" value ="test_12"/>
+                                                   <button type="submit" class="btn btn-primary"> save Script </button>
                                      </div>
                                              
                                         </form>
                                     </div>    
                                 
                                 </div>
-                                <div class="col-xs-6 col-md-4">.col-xs-6 .col-md-4</div>
+                                
                             </div>
                             <div class="row show-grid">
-                                <div class="col-xs-6 col-md-4">.col-xs-6 .col-md-4</div>
-                                <div class="col-xs-6 col-md-4">.col-xs-6 .col-md-4</div>
-                                <div class="col-xs-6 col-md-4">.col-xs-6 .col-md-4</div>
+                                <div class="col-xs-6 col-md-4"><a href="training_dataSet">Show training Data Set</a>  </div>
+                                <div class="col-xs-6 col-md-4"><a href="test_dataSet">how training test Set</a></div>
+                               
                             </div>
-                            <div class="row show-grid">
-                                <div class="col-xs-6">.col-xs-6</div>
-                                <div class="col-xs-6">.col-xs-6</div>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>

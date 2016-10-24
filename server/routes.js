@@ -20,16 +20,29 @@ var upload = multer({
 
 router.get('/', function(req, res) {
 
-    res.render('pages/index.ejs');
+    dmn.count({}, function(err, count) {
+        if (err) {
+            console.log(err);
+
+        } else {
+            res.render('pages/index.ejs', {
+                nbre_Domaine: count
+            })
+        }
+
+
+    });
+
+
+    ;
 });
 
 router.get('/AddNewDomaine', function(req, res) {
     res.render('pages/newAnalysis.ejs');
 });
 
-
 router.post('/PostAddNewDomaine', upload.single('lexiconDataBase'), function(req, res) {
-    
+
     if (req.file) {
 
         fs.readFile("./uploads/" + req.file.filename, 'utf8', function(err, data) {
@@ -38,7 +51,7 @@ router.post('/PostAddNewDomaine', upload.single('lexiconDataBase'), function(req
             parse(data, {
                 columns: true
             }, function(err, output) {
-                if (err) console.log(err);               
+                if (err) console.log(err);
 
                 var domaine = new dmn({
                     domaine_name: req.body.domaineName,
@@ -51,8 +64,9 @@ router.post('/PostAddNewDomaine', upload.single('lexiconDataBase'), function(req
                 domaine.save(function(err, domaine) {
                     if (err) {
                         console.log(err);
-                    } 
+                    }
 
+                    req.session.domaine = domaine;
                     req.method = 'get';
                     res.redirect('/edit_domaine');
                 });
@@ -60,20 +74,32 @@ router.post('/PostAddNewDomaine', upload.single('lexiconDataBase'), function(req
 
         })
     }
-    
+
 });
 
-router.get("/edit_domaine", function(req, res)
+router.get("/edit_domaine", function(req, res) {
 
-    {
-        console.log('edit_domaine')
-        var text = "Hello word"
-        res.render('pages/grid.ejs', {
-            tagline: text
+
+    if (req.query.id) {
+
+        dmn.findById(req.query.id, function(err, domaine) {
+            if (err) {
+                console.log(err);
+            } else {
+
+                req.session.domaine = domaine;
+                res.render('pages/edit_analysis.ejs', {
+                    tagline: req.session.domaine.domaine_trainingScript
+                });
+
+            }
+        })
+    } else {
+        res.render('pages/edit_analysis.ejs', {
+            tagline: req.session.domaine.domaine_trainingScript
         });
     }
-);
-
+});
 
 router.post('/importTrainingScrip', upload.single('trainingScript'), function(req, res) {
 
@@ -81,15 +107,121 @@ router.post('/importTrainingScrip', upload.single('trainingScript'), function(re
 
         fs.readFile("./uploads/" + req.file.filename, 'utf8', function(err, data) {
             if (err) console.log(err);
-           req.session.domaine.domaine_trainingScript = data;
+            req.session.domaine.domaine_trainingScript = data;
 
             req.method = 'get';
             res.redirect('/edit_domaine');
 
-           
         })
     }
 
 });
+
+router.post('/updateScript', urlencodedParser, function(req, res) {
+
+
+
+    dmn.findById(req.session.domaine._id, function(err, domaine) {
+        if (err) {
+            console.log(err);
+        }
+        domaine.domaine_trainingScript = req.body.script
+        domaine.save(function(err, domaine) {
+
+            if (err) {
+                console.log(err);
+            }
+            req.session.domaine = domaine;
+            req.method = 'get';
+            res.redirect('/edit_domaine');
+        })
+
+
+    })
+
+});
+
+router.get('/domaine_list', function(req, res) {
+
+    dmn.aggregate([{
+        $project: {
+            _id: 1,
+            domaine_name: 1,
+            domaine_language: 1
+
+        }
+    }], function(err, result) {
+        if (err) {
+            console.log(err);
+
+        } else {
+
+
+            res.render('pages/list_domaine.ejs', {
+                datas: result
+            });
+        }
+
+    });
+});
+
+router.get('/training_dataSet', function(req, res) {
+
+    var domaine = req.session.domaine;
+
+    if (domaine) {
+        //Get column list form mongodb
+        //constact ajax criteria
+        res.render('pages/learning_data.ejs');
+
+    }
+})
+
+router.post('/data_training_list_server_processing', urlencodedParser, function(req, res) {
+
+
+    datatablesQuery = require('datatables-query');
+
+
+})
+
+
+router.post('/importTrainingData', upload.single('trainingData'), function(req, res) {
+
+    console.log('importTrainingData')
+    fs.readFile("./uploads/" + req.file.filename, 'utf8', function(err, data) {
+        if (err) throw err;
+
+        parse(data, {
+            columns: true
+        }, function(err, output) {
+
+            console.log(output)
+
+            dmn.findById(req.session.domaine._id, function(err, domaine) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    
+                    console.log(domaine)
+                    domaine.domaine_trainingData = data
+                    domaine.save(function(err, domaine) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            req.session.domaine = domaine;
+                            req.method = 'get';
+                            res.redirect('/training_dataSet');
+                        }
+
+                    });
+                }
+
+            })
+
+        });
+    })
+})
+
 
 module.exports = router;

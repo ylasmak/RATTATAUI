@@ -1,0 +1,54 @@
+
+library(RTextTools)
+library(mlbench)
+library(caret)
+library(ggplot2)
+library(tm)
+library(wordcloud)
+library(SparseM)
+
+setwd('C:/Users/Shneebly PC/Desktop/yns')
+
+Tweets <- read.csv('Tweets.csv', stringsAsFactors = F)
+
+Tweets$result = 0
+Tweets$result[Tweets$airline_sentiment == "neutral"] <- 0
+Tweets$result[Tweets$airline_sentiment == "positive"] <- 1
+Tweets$result[Tweets$airline_sentiment == "negative"] <- -1
+
+dataset <- subset(Tweets, select = c(result, text ))
+
+
+
+matrix <- create_matrix(dataset$text, language="english", removeNumbers=FALSE, stemWords=FALSE, removePunctuation=FALSE, weighting=weightTfIdf)
+container <- create_container(matrix,dataset$result,trainSize=1:12000, testSize=12001:14640,virgin=FALSE)
+
+SVM <- train_model(container,"SVM")
+BOOSTING <- train_model(container,"BOOSTING")
+RF <- train_model(container,"RF")
+
+
+
+SVM_CLASSIFY <- classify_model(container, SVM)
+BOOSTING_CLASSIFY <- classify_model(container, BOOSTING)
+RF_CLASSIFY <- classify_model(container, RF)
+
+
+
+analytics <- create_analytics(container,
+                              cbind(SVM_CLASSIFY, 
+                                    BOOSTING_CLASSIFY,
+                                    BOOSTING_CLASSIFY, 
+                              ))
+summary(analytics)
+
+
+#models <- train_models(container, algorithms="SVM" , kernel = "radial", cost = 10, cross = 10)
+#results <- classify_models(container, models)
+
+#analytics <- create_analytics(container, results)
+
+#summary(analytics)
+
+
+
