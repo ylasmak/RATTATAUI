@@ -179,9 +179,8 @@ router.get('/training_dataSet', function(req, res) {
 
 router.post('/data_training_list_server_processing', urlencodedParser, function(req, res) {
 
-
-    datatablesQuery = require('datatables-query');
-
+    console.log('data_training_list_server_processing')
+    console.log(req)
 
 })
 
@@ -196,19 +195,22 @@ router.post('/importTrainingData', upload.single('trainingData'), function(req, 
             columns: true
         }, function(err, output) {
 
-            console.log(output)
+            //  console.log(output)
 
             dmn.findById(req.session.domaine._id, function(err, domaine) {
                 if (err) {
                     console.log(err);
                 } else {
-                    
-                    console.log(domaine)
-                    domaine.domaine_trainingData = data
+
+                    console.log('in 1')
+                   // console.log(domaine._id)
+                    domaine.domaine_training_data = output
                     domaine.save(function(err, domaine) {
                         if (err) {
                             console.log(err);
                         } else {
+                            console.log('saving')
+                            // console.log(domaine)
                             req.session.domaine = domaine;
                             req.method = 'get';
                             res.redirect('/training_dataSet');
