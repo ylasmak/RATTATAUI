@@ -6,6 +6,7 @@ var parse = require('csv-parse');
 
 
 var dmn = require('./Model/domaine_analysis');
+var mongo = require('./data_base/mongodb');
 
 var router = express.Router();
 var urlencodedParser = bodyParser.urlencoded({
@@ -170,8 +171,9 @@ router.get('/training_dataSet', function(req, res) {
     var domaine = req.session.domaine;
 
     if (domaine) {
-        //Get column list form mongodb
-        //constact ajax criteria
+        var instance = new mongo();
+        var result =  instance.pagination(domaine.domaine_training_data,100,0);
+        console.log(result);
         res.render('pages/learning_data.ejs');
 
     }
@@ -201,13 +203,16 @@ router.post('/importTrainingData', upload.single('trainingData'), function(req, 
                     console.log(err);
                 } else {
                     
-                    domaine.domaine_training_data = output
+                    domaine.domaine_training_data = domaine.domaine_name +'_'+'training_data'
                     domaine.save(function(err, domaine) {
                         if (err) {
                             console.log(err);
                         } else {
                             
                             req.session.domaine = domaine;
+                            var instance = new mongo();
+                            instance.insertMany(domaine.domaine_training_data,output)
+                            
                             req.method = 'get';
                             res.redirect('/training_dataSet');
                         }

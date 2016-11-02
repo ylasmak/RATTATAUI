@@ -1,54 +1,66 @@
-(function (database) {
-
-    var MongoClient = require('mongodb').MongoClient;
-    var mongoose = require('mongoose');
+var MongoClient = require('mongodb').MongoClient;
 
 
-    function MongoDb(url) {
-        this.url = url;
-    }
+function MongoDb() {
 
-    MongoDb.prototype.insert = function (collection, object) {
+    this.url = require("./database_configuration");
+    console.log(this.url);
+}
+
+MongoDb.prototype.insertMany = function(collection, object) {
 
 
-        mongoose.connect(this.url);
+    console.log('insertMany');
+    MongoClient.connect(this.url, function(err, db) {
+        if (err) {
+            /// error = err;
+            return console.log(err);
+        }
 
-        MongoClient.connect(this.url, function (err, db) {
+        db.collection(collection).insertMany(object, function(err, inserted) {
             if (err) {
-                return console.log(err);
+                console.log(err);
+            } else {
+                console.log('inserted');
             }
-
-            db.collection(collection).insertOne(object, function (err, inserted) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    console.log(inserted);
-                }
-
-            });
 
         });
 
-    };
+    });
 
-    MongoDb.prototype.where = function (collection, object) {
+};
 
-        MongoClient.connect(this.url, function (err, db) {
+MongoDb.prototype.where = function(collection, object) {
+
+    MongoClient.connect(this.url, function(err, db) {
+        if (err) {
+            return console.log(err);
+        }
+
+        db.collection(collection).findOne(object, function(err, document) {
             if (err) {
-                return console.log(err);
+                console.log(err);
+            } else {
+                return document;
             }
-
-            db.collection(collection).findOne(object, function (err, document) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    return document;
-                }
-
-            });
 
         });
 
+    });
 
-    };
-})(module.exports);
+
+};
+
+MongoDb.prototype.pagination = function(collection, filter, start, skip) {
+
+    MongoClient.connect(this.url, function(err, db) {
+        if (err) {
+            return console.log(err);
+        }
+
+      document =  db.collection(collection).collection.find(filter).skip(start).limit(skip); 
+    });
+};
+
+
+module.exports = MongoDb;

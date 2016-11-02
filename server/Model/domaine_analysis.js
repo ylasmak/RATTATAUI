@@ -15,8 +15,7 @@ var domaineSchema = new Schema({
   domaine_trainingScript:  String,
   domaine_predictionScript:  String,
   domaine_lexicon_data_base: [],
-  domaine_training_data :  [],    
-      
+  domaine_training_data :  String,          
   created_at: Date
 });
 
