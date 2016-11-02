@@ -172,9 +172,11 @@ router.get('/training_dataSet', function(req, res) {
 
     if (domaine) {
         var instance = new mongo();
-        var result =  instance.pagination(domaine.domaine_training_data,100,0);
-        console.log(result);
+        instance.pagination(domaine.domaine_training_data,{},0,5,function(err,data){
+             
         res.render('pages/learning_data.ejs');
+        });
+      
 
     }
 })

@@ -51,14 +51,28 @@ MongoDb.prototype.where = function(collection, object) {
 
 };
 
-MongoDb.prototype.pagination = function(collection, filter, start, skip) {
+MongoDb.prototype.pagination = function(collection, filter, skip, limit,callback) {
 
     MongoClient.connect(this.url, function(err, db) {
         if (err) {
             return console.log(err);
         }
 
-      document =  db.collection(collection).collection.find(filter).skip(start).limit(skip); 
+          
+        var options = {
+            "limit": limit,
+            "skip": skip,
+
+        }
+        
+        
+      console.log(collection)
+        db.collection(collection).find(filter, options).toArray(function(err, docs) {
+            
+           callback(err,docs) ;
+        });
+
+       
     });
 };
 
