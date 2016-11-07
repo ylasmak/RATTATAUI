@@ -172,20 +172,47 @@ router.get('/training_dataSet', function(req, res) {
 
     if (domaine) {
         var instance = new mongo();
-        instance.pagination(domaine.domaine_training_data,{},0,5,function(err,data){
-             
-        res.render('pages/learning_data.ejs');
+
+        var collection;
+
+        if (req.query.type == 'training') {
+            collection = domaine.domaine_training_data;
+        }
+        if (req.query.type == 'test') {
+            collection = domaine.domaine_test_data;
+        }
+
+        instance.collectionExist(collection, function(err, result) {
+            if (err)
+                throw err;
+            if (result) {
+                instance.pagination(collection, {}, 0, 250, function(err, data) {
+
+                    var myJson = data[0];
+                    var array_column = new Array();
+                    var i = 0;
+                    for (var key in myJson) {
+                        array_column[i] = key;
+                        i = i + 1;
+                    }
+
+                    res.render('pages/learning_data.ejs', {
+                        columns: array_column,
+                        dataSet: data
+                    });
+
+                });
+            } else {
+          
+                res.render('pages/learning_data.ejs', {
+                    columns: null,
+                    dataSet: null
+                });
+            }
+
         });
-      
 
     }
-})
-
-router.post('/data_training_list_server_processing', urlencodedParser, function(req, res) {
-
-    console.log('data_training_list_server_processing')
-   // console.log(req)
-
 })
 
 
@@ -199,22 +226,22 @@ router.post('/importTrainingData', upload.single('trainingData'), function(req, 
             columns: true
         }, function(err, output) {
 
-        
+
             dmn.findById(req.session.domaine._id, function(err, domaine) {
                 if (err) {
                     console.log(err);
                 } else {
-                    
-                    domaine.domaine_training_data = domaine.domaine_name +'_'+'training_data'
+
+                    domaine.domaine_training_data = domaine.domaine_name + '_' + 'training_data'
                     domaine.save(function(err, domaine) {
                         if (err) {
                             console.log(err);
                         } else {
-                            
+
                             req.session.domaine = domaine;
                             var instance = new mongo();
-                            instance.insertMany(domaine.domaine_training_data,output)
-                            
+                            instance.insertMany(domaine.domaine_training_data, output)
+
                             req.method = 'get';
                             res.redirect('/training_dataSet');
                         }

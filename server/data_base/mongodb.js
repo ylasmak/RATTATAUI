@@ -51,30 +51,46 @@ MongoDb.prototype.where = function(collection, object) {
 
 };
 
-MongoDb.prototype.pagination = function(collection, filter, skip, limit,callback) {
+MongoDb.prototype.pagination = function(collection, filter, skip, limit, callback) {
 
     MongoClient.connect(this.url, function(err, db) {
         if (err) {
             return console.log(err);
         }
 
-          
         var options = {
             "limit": limit,
             "skip": skip,
 
         }
-        
-        
-      console.log(collection)
+
         db.collection(collection).find(filter, options).toArray(function(err, docs) {
-            
-           callback(err,docs) ;
+
+            callback(err, docs);
         });
 
-       
+
     });
 };
 
+MongoDb.prototype.collectionExist = function(collection, callback) {
 
-module.exports = MongoDb;
+    console.log(collection);
+    
+    if (!collection) callback(collection, collection)
+        else {
+            MongoClient.connect(this.url, function(err, db) {
+
+                if (err) throw err;
+                db.collection(collection, function(err, result) {
+
+                    callback(err, result);
+                });
+
+            });
+        }
+
+    };
+
+
+    module.exports = MongoDb;
